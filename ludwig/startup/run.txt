@@ -1,0 +1,11 @@
+chmod +x init_ludwig.sh
+./init_ludwig.sh
+
+cd ludwig
+
+python manage.py makemigrations ludwig
+python manage.py migrate
+
+cd .\ludwig\scripts\
+
+python scripts/import_harmonics.py --csv scripts/datasets/dataset.csv
