@@ -55,7 +55,15 @@ def read_csv(csv_path, max_rows=MAX_ROWS):
         'V_PREVAIL_MAG_1',
         'V_PREVAIL_MAG_2',
         'V_PREVAIL_MAG_3',
-        'V_PREVAIL_MAG_4'
+        'V_PREVAIL_MAG_4',
+        'I_PREVAIL_ANG_1',
+        'I_PREVAIL_ANG_2',
+        'I_PREVAIL_ANG_3',
+        'I_PREVAIL_ANG_4',
+        'I_PREVAIL_MAG_1',
+        'I_PREVAIL_MAG_2',
+        'I_PREVAIL_MAG_3',
+        'I_PREVAIL_MAG_4',
     }
     found_headers = set(headers)
     if not required_headers.issubset(found_headers):
@@ -128,6 +136,14 @@ def read_csv(csv_path, max_rows=MAX_ROWS):
             'v_prevail_mag2': safe_float('V_PREVAIL_MAG_2'),
             'v_prevail_mag3': safe_float('V_PREVAIL_MAG_3'),
             'v_prevail_mag4': safe_float('V_PREVAIL_MAG_4'),
+            'I_prevail_ang1': safe_float('I_PREVAIL_ANG_1'),
+            'I_prevail_ang2': safe_float('I_PREVAIL_ANG_2'),
+            'I_prevail_ang3': safe_float('I_PREVAIL_ANG_3'),
+            'I_prevail_ang4': safe_float('I_PREVAIL_ANG_4'),
+            'I_prevail_mag1': safe_float('I_PREVAIL_MAG_1'),
+            'I_prevail_mag2': safe_float('I_PREVAIL_MAG_2'),
+            'I_prevail_mag3': safe_float('I_PREVAIL_MAG_3'),
+            'I_prevail_mag4': safe_float('I_PREVAIL_MAG_4'),
         }
         if idx < 5:
             print(f"DEBUG: Row {idx+1} accepted as record: {record}")
@@ -157,7 +173,15 @@ def import_records(records):
             v_prevail_mag1=rec['v_prevail_mag1'],
             v_prevail_mag2=rec['v_prevail_mag2'],
             v_prevail_mag3=rec['v_prevail_mag3'],
-            v_prevail_mag4=rec['v_prevail_mag4']
+            v_prevail_mag4=rec['v_prevail_mag4'],
+            I_prevail_ang1=rec['I_prevail_ang1'],
+            I_prevail_ang2=rec['I_prevail_ang2'],
+            I_prevail_ang3=rec['I_prevail_ang3'],
+            I_prevail_ang4=rec['I_prevail_ang4'],
+            I_prevail_mag1=rec['I_prevail_mag1'],
+            I_prevail_mag2=rec['I_prevail_mag2'],
+            I_prevail_mag3=rec['I_prevail_mag3'],
+            I_prevail_mag4=rec['I_prevail_mag4'],
         )
         instance.save()
         inserted_count += 1

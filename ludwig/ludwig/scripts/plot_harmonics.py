@@ -2,16 +2,17 @@
 """
 Script to generate polar scatter plots for each harmonic number.
 For each distinct harmonic number, the script queries all HarmonicRecord
-entries and plots two sets of data:
-  1. Measured (Angle, Magnitude) pairs for each channel: (v_prevail_ang1, v_prevail_mag1)
-     through (v_prevail_ang4, v_prevail_mag4).
-  2. Magnitude-only points: for each channel, plot the v_prevail_magX value at a fixed angle.
-     The fixed angles are: channel 1 = 0 rad, channel 2 = π/2, channel 3 = π, channel 4 = 3π/2.
-Each series is plotted as colored circles with fixed marker size and alpha transparency.
-A legend labels each series with custom labels:
-  - "Prevail Ang X" for the measured angle data,
-  - "Prevail Mag X" for the magnitude-only data,
-all rendered in Goudy Old Style.
+entries and produces two separate plots:
+  1. A plot for the v_prevail_* fields:
+       - Measured (Angle, Magnitude) pairs: (v_prevail_ang1, v_prevail_mag1) ... (v_prevail_ang4, v_prevail_mag4)
+       - Magnitude-only points plotted at fixed angles:
+         channel 1 at 0 rad, channel 2 at π/2, channel 3 at π, channel 4 at 3π/2.
+       Legend labels are "Prevail Ang X" and "Prevail Mag X".
+  2. A plot for the I_prevail_* fields:
+       - Measured (Angle, Magnitude) pairs: (I_prevail_ang1, I_prevail_mag1) ... (I_prevail_ang4, I_prevail_mag4)
+       - Magnitude-only points at fixed angles as above.
+       Legend labels are "I Prevail Ang X" and "I Prevail Mag X".
+All legend text is rendered in the custom Goudy Old Style font (loaded from the local fonts folder).
 Angular tick labels are removed.
 Each plot is saved as a PNG file in a 'plots' folder.
 """
@@ -56,42 +57,55 @@ def get_records_grouped_by_harmonic():
         grouped_records[harmonic] = records
     return grouped_records
 
-def create_polar_plot_for_harmonic(harmonic, records):
+def create_polar_plot_for_group(harmonic, records, prefix, legend_ang, legend_mag, title_suffix):
     """
-    For the given harmonic number and its records, create a polar scatter plot.
-    The plot includes two sets of data:
-      1. Measured (Angle, Magnitude) pairs using the v_prevail_angX and v_prevail_magX fields.
-      2. Magnitude-only points: for each channel, plot the v_prevail_magX value at a fixed angle.
-         Fixed angles are: channel 1 = 0 rad, channel 2 = π/2, channel 3 = π, channel 4 = 3π/2.
-    Each series is plotted as colored circles with fixed marker size and alpha transparency.
-    A legend labels each series with custom labels ("Prevail Ang X" and "Prevail Mag X")
-    rendered in the custom Goudy Old Style font.
+    Create a polar scatter plot for the given harmonic number and a given group of fields.
+    
+    Parameters:
+      harmonic     : the harmonic number.
+      records      : a list of HarmonicRecord objects.
+      prefix       : the prefix string to use for field names (e.g. "v_prevail_" or "I_prevail_").
+      legend_ang   : the label base for the measured angle data (e.g. "Prevail Ang" or "I Prevail Ang").
+      legend_mag   : the label base for the magnitude data (e.g. "Prevail Mag" or "I Prevail Mag").
+      title_suffix : a string appended to the plot title (e.g. "v_prevail" or "I_prevail").
+    
+    The function extracts for channels 1 to 4:
+      - Measured angles (converted from degrees to radians) from field {prefix}angX.
+      - Magnitudes from field {prefix}magX.
+    It plots:
+      1. The (angle, magnitude) pairs.
+      2. The magnitude-only points, plotted at fixed angles:
+         channel 1 at 0, channel 2 at π/2, channel 3 at π, channel 4 at 3π/2.
+    Unique colors are assigned per channel.
+    The plot title and legend use the custom Goudy Old Style font.
     Angular tick labels are removed.
-    The plot is saved as a PNG file in a 'plots' folder.
+    The plot is saved in a 'plots' folder.
     """
-    # Prepare series for measured (Angle, Magnitude) pairs.
+    # Prepare data for measured (Angle, Magnitude) pairs.
     series_data = {i: {"theta": [], "radius": []} for i in range(1, 5)}
-    # Also prepare series for magnitude-only data.
+    # Prepare data for magnitude-only series.
     mag_series_data = {i: [] for i in range(1, 5)}
     for record in records:
         for i in range(1, 5):
-            angle_val = getattr(record, f"v_prevail_ang{i}", None)
-            mag_val = getattr(record, f"v_prevail_mag{i}", None)
+            ang_field = f"{prefix}ang{i}"
+            mag_field = f"{prefix}mag{i}"
+            angle_val = getattr(record, ang_field, None)
+            mag_val = getattr(record, mag_field, None)
             if angle_val is not None and mag_val is not None:
-                theta = np.deg2rad(angle_val)  # convert measured angle to radians
+                theta = np.deg2rad(angle_val)
                 series_data[i]["theta"].append(theta)
                 series_data[i]["radius"].append(mag_val)
             if mag_val is not None:
                 mag_series_data[i].append(mag_val)
-
+                
     fig, ax = plt.subplots(subplot_kw={"projection": "polar"})
 
-    # Define unique colors for each channel.
+    # Define unique colors for channels 1-4.
     colors = {
-        1: {"angle": "#FF0000", "mag": "#FF00FF"},  # Channel 1: Red for angle, Magenta for magnitude
-        2: {"angle": "#00FF00", "mag": "#00FFFF"},  # Channel 2: Green for angle, Cyan for magnitude
-        3: {"angle": "#0000FF", "mag": "#FFA500"},  # Channel 3: Blue for angle, Orange for magnitude
-        4: {"angle": "#FFFF00", "mag": "#800080"},  # Channel 4: Yellow for angle, Purple for magnitude
+        1: {"angle": "#FF0000", "mag": "#FF00FF"},  # Red and Magenta
+        2: {"angle": "#00FF00", "mag": "#00FFFF"},  # Green and Cyan
+        3: {"angle": "#0000FF", "mag": "#FFA500"},  # Blue and Orange
+        4: {"angle": "#FFFF00", "mag": "#800080"},  # Yellow and Purple
     }
     
     marker_size = 100
@@ -109,12 +123,11 @@ def create_polar_plot_for_harmonic(harmonic, records):
                 color=colors[i]["angle"],
                 s=marker_size,
                 alpha=alpha_val,
-                label=f"Prevail Ang {i}"
+                label=f"{legend_ang} {i}"
             )
 
-    # Define fixed angles for magnitude-only series.
+    # Fixed angles for magnitude-only series.
     fixed_angles = {1: 0, 2: np.pi/2, 3: np.pi, 4: 3*np.pi/2}
-    # Plot magnitude-only data at fixed angles.
     for i in range(1, 5):
         mags = mag_series_data[i]
         if mags:
@@ -126,18 +139,18 @@ def create_polar_plot_for_harmonic(harmonic, records):
                 color=colors[i]["mag"],
                 s=marker_size,
                 alpha=alpha_val,
-                label=f"Prevail Mag {i}"
+                label=f"{legend_mag} {i}"
             )
 
-    # Load custom font from local fonts folder.
+    # Load custom font from the local fonts folder.
     font_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "fonts", "GoudyOldStyle.ttf")
     myfont = FontProperties(fname=font_path, size=10)
-    ax.set_title(f"Plot For Harmonic number {harmonic}", fontproperties=myfont, fontsize=10)
+    ax.set_title(f"Plot For Harmonic number {harmonic} - {title_suffix}", fontproperties=myfont, fontsize=10)
 
     # Remove angular tick labels.
     ax.set_xticklabels([])
 
-    # Create a legend with custom font in the right corner.
+    # Create legend with custom font.
     legend_font = FontProperties(fname=font_path, size=7)
     ax.legend(loc="upper right", bbox_to_anchor=(1.2, 1.1), markerscale=0.3, prop=legend_font)
 
@@ -145,14 +158,15 @@ def create_polar_plot_for_harmonic(harmonic, records):
     plots_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), "plots")
     if not os.path.exists(plots_dir):
         os.makedirs(plots_dir)
-    plot_file = os.path.join(plots_dir, f"harmonic_{harmonic}_plot.png")
+    plot_file = os.path.join(plots_dir, f"harmonic_{harmonic}_{title_suffix}_plot.png")
     fig.savefig(plot_file, bbox_inches="tight")
     plt.close(fig)
     return plot_file
 
 def main():
     """
-    Main entry point: query the database, generate and save a plot for each harmonic number.
+    Main entry point: query the database, and for each harmonic number,
+    generate two plots – one for the v_prevail_* fields and one for the I_prevail_* fields.
     """
     parser = argparse.ArgumentParser(
         description="Generate polar scatter plots for each harmonic number in the DB."
@@ -162,9 +176,21 @@ def main():
     grouped_records = get_records_grouped_by_harmonic()
     harmonic_count = 0
     for harmonic, records in grouped_records.items():
-        print(f"DEBUG: Generating plot for harmonic {harmonic} with {len(records)} records.")
-        plot_path = create_polar_plot_for_harmonic(harmonic, records)
-        print(f"DEBUG: Plot saved to {plot_path}.")
+        print(f"DEBUG: Generating plots for harmonic {harmonic} with {len(records)} records.")
+        # Generate plot for v_prevail_* fields.
+        plot_vprevail = create_polar_plot_for_group(
+            harmonic, records, prefix="v_prevail_",
+            legend_ang="Prevail Ang", legend_mag="Prevail Mag",
+            title_suffix="v_prevail"
+        )
+        print(f"DEBUG: v_prevail plot saved to {plot_vprevail}.")
+        # Generate plot for I_prevail_* fields.
+        plot_Iprevail = create_polar_plot_for_group(
+            harmonic, records, prefix="I_prevail_",
+            legend_ang="I Prevail Ang", legend_mag="I Prevail Mag",
+            title_suffix="I_prevail"
+        )
+        print(f"DEBUG: I_prevail plot saved to {plot_Iprevail}.")
         harmonic_count += 1
     print(f"Generated plots for {harmonic_count} harmonic numbers.")
 
