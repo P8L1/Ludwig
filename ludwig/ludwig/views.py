@@ -25,7 +25,7 @@ def generate_plot(request):
 
             # Construct the plot filename.
             filename = f"polar_scatter_{phase.replace(' ', '_')}_{harm_number}.png"
-            # Assume that the plots folder is served as static files under /static/plots/
+
             plot_url = f"/static/plots/{filename}"
         except Exception as e:
             error = str(e)

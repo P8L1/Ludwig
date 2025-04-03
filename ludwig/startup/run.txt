@@ -8,5 +8,5 @@ python manage.py migrate
 
 cd .\ludwig\scripts\
 
-python scripts/import_harmonics.py --csv scripts/datasets/dataset.csv                   (PS E:\Ludwig\ludwig\ludwig> )
+python load_csv.py dataset.csv
 python scripts/plot_harmonics.py                                                        (PS E:\Ludwig\ludwig\ludwig> )   
