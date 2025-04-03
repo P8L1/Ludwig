@@ -35,15 +35,24 @@ os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def get_font_properties():
     """
-    Returns default font properties for plot titles.
+    Returns custom font properties loaded from the 'fonts' directory.
 
     Returns:
         matplotlib.font_manager.FontProperties: Font properties for plot titles.
+
+    Raises:
+        AssertionError: If the fonts directory or the font file is not found,
+                        or if font properties creation fails.
     """
-    font_props = fm.FontProperties(family="sans-serif", size=9)
+    fonts_dir = os.path.join(os.path.dirname(__file__), "fonts")
+    assert os.path.isdir(fonts_dir), f"Fonts directory '{fonts_dir}' not found."
+    font_file = os.path.join(fonts_dir, "YourCustomFont.ttf")
+    assert os.path.exists(font_file), f"Font file '{font_file}' does not exist."
+    font_props = fm.FontProperties(fname=font_file, size=9)
     assert font_props is not None, "Failed to create font properties."
     assert isinstance(font_props, fm.FontProperties), "Font properties is not a FontProperties instance."
     return font_props
+
 
 
 def fetch_data(harm_number, night_mode, threshold_percentage):
