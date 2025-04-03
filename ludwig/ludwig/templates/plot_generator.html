@@ -1,0 +1,63 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Polar Scatter Plot Generator</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Polar Scatter Plot Generator</h1>
+      {% if error %}
+      <div class="error">{{ error }}</div>
+      {% endif %}
+      <form id="plotForm" method="post" action="{% url 'generate_plot' %}">
+        {% csrf_token %}
+        <div class="form-group">
+          <label for="harm_number">Harmonic Number:</label>
+          <input
+            type="number"
+            id="harm_number"
+            name="harm_number"
+            min="1"
+            value="3"
+            required
+          />
+        </div>
+        <div class="form-group">
+          <label for="phase">Phase:</label>
+          <select id="phase" name="phase">
+            <option value="Phase A">Phase A</option>
+            <option value="Phase B">Phase B</option>
+            <option value="Phase C">Phase C</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="night_mode">Night Mode:</label>
+          <input type="checkbox" id="night_mode" name="night_mode" />
+        </div>
+        <div class="form-group">
+          <label for="threshold">Threshold Percentage:</label>
+          <input
+            type="number"
+            id="threshold"
+            name="threshold"
+            step="any"
+            placeholder="e.g., 10"
+          />
+        </div>
+        <button type="submit" id="runButton">Run</button>
+      </form>
+      <div id="result">
+        {% if plot_url %}
+        <p>
+          Plot generated: <a href="{{ plot_url }}" target="_blank">View Plot</a>
+        </p>
+        <img src="{{ plot_url }}" alt="Polar Scatter Plot" />
+        {% endif %}
+      </div>
+    </div>
+    <script src="{% static 'js/script.js' %}"></script>
+  </body>
+</html>
