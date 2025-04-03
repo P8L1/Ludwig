@@ -46,7 +46,7 @@ def get_font_properties():
     """
     fonts_dir = os.path.join(os.path.dirname(__file__), "fonts")
     assert os.path.isdir(fonts_dir), f"Fonts directory '{fonts_dir}' not found."
-    font_file = os.path.join(fonts_dir, "YourCustomFont.ttf")
+    font_file = os.path.join(fonts_dir, "GoudyOldStyle.ttf")
     assert os.path.exists(font_file), f"Font file '{font_file}' does not exist."
     font_props = fm.FontProperties(fname=font_file, size=9)
     assert font_props is not None, "Failed to create font properties."
@@ -127,6 +127,7 @@ def generate_and_save_plots(df, phase, harm_number):
         idx = z.argsort()
         theta, r, z = theta[idx], r[idx], z[idx]
         ax.clear()
+        ax.set_xticklabels([]) 
         ax.scatter(theta, r, c=z, s=20, cmap="inferno", alpha=0.75)
         ax.set_title(f"{label} Density Plot, {phase}", fontproperties=get_font_properties())
         assert ax.get_title() != "", f"Title not set for axis plotting {label}."
