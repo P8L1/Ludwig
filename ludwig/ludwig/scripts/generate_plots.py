@@ -6,8 +6,7 @@ Description:
     retrieves the harmonic data, generates polar scatter plots using Gaussian KDE,
     and saves the resulting figure in the 'scripts/plots' directory.
 Usage:
-    python generate_plots.py [--harm_number 3] [--phase "Phase A"]
-                             [--night_mode] [--threshold 10]
+    Called in views never run it on its own.
 """
 
 import os
@@ -23,7 +22,7 @@ import django
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ludwig.settings")
 django.setup()
 
-from ludwig.models import HarmData  # noqa: E402
+from ludwig.models import HarmData
 
 # Define the mapping of phase names to column suffixes.
 PHASE_COLUMNS = {'Phase A': '_1', 'Phase B': '_2', 'Phase C': '_3'}

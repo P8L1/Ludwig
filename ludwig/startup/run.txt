@@ -1,12 +1,16 @@
-chmod +x init_ludwig.sh
-./init_ludwig.sh
+sit datastel in die scripts/datasets folder Maak seker hy is benoem as dataset.csv
 
-cd ludwig
+pip install -r requirements.txt
 
 python manage.py makemigrations ludwig
 python manage.py migrate
 
-cd .\ludwig\scripts\
+
+cd ludwig/scripts
 
 python load_csv.py dataset.csv
-python scripts/plot_harmonics.py                                                        (PS E:\Ludwig\ludwig\ludwig> )   
+
+python manage.py runserver 0.0.0.0:8000
+
+gaan na http://127.0.0.1:8000/generate_plot/ In browser
+                                                

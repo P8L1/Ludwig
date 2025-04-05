@@ -17,12 +17,12 @@ from decimal import Decimal
 import django
 from django.db import connection
 
-# Adjust sys.path so Django can locate the settings.
+# Make sure Django can locate the settings.
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "ludwig.settings")
 django.setup()
 
-from ludwig.models import HarmData  # noqa: E402
+from ludwig.models import HarmData 
 
 # Define the required CSV columns for plotting.
 REQUIRED_COLUMNS = [
